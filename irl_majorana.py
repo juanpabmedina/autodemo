@@ -49,8 +49,8 @@ from automode.modules.chocolate import Behavior, Condition
 # def intersect(a, b, c, d):
 #     return (ccw(a,c,d) != ccw(b,c,d)) and (ccw(a,b,c) != ccw(a,b,d))
 
-def img_generator(self, positions):
-    img_base = cv2.imread(self.img_base_path)
+def img_generator(positions, img_base_path):
+    img_base = cv2.imread(img_base_path)
     conversion_factor = 330/1.227894 # radio del cirulo donde se posicionan los robots en px dividido por el radio en metros
     x_0 = 355 
     y_0 = 350 
@@ -68,7 +68,7 @@ def img_generator(self, positions):
 
     return img_base
 
-def histogram_comparision(self, img1, img2, d_kernel, stride, method):
+def histogram_comparision(img1, img2, d_kernel, stride, method):
 
     kernel = np.ones((d_kernel,d_kernel), np.float32) / d_kernel**2
 
@@ -116,7 +116,7 @@ def histogram_comparision(self, img1, img2, d_kernel, stride, method):
 
     return(img_out1, vector_out1[0])
 
-def compute_phi(fsm, argos, img_base):
+def compute_phi(fsm, argos, img_base_path):
     """ Compute a list of info relative to the fsm
     firsts elements are states and conditions of the fsm
     before last element is the fsm in command line for argos
@@ -212,7 +212,8 @@ def compute_phi(fsm, argos, img_base):
     d_kernel = 100
     method = cv2.HISTCMP_BHATTACHARYYA
 
-    generate_img = img_generator(swarm_pos)
+    generate_img = img_generator(swarm_pos, img_base_path)
+    img_base = cv2.imread(img_base_path)
 
     _, phi = histogram_comparision(generate_img, img_base, d_kernel=d_kernel, stride=d_kernel+1, method=method)
     
