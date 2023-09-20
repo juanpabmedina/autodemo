@@ -6,6 +6,7 @@ import os
 import ast
 import sys
 import json
+import cv2
 from xml.dom import minidom
 from math import exp, sqrt, sin, cos
 from sklearn import svm
@@ -36,7 +37,13 @@ class AUTODEMO:
         self.folder = f"/home/jpmedina/autodemo/irace/{experience}"
         self.demoFile = f"{self.folder}/mission-folder/{self.mission}.argos"
         self.arenaD = 3
-        self.patches, self.obstacles = self.retrievePatches(self.demoFile)
+        # self.patches, self.obstacles = self.retrievePatches(self.demoFile)
+
+        self.img_path_names = os.listdir(f"{self.folder}/mission-folder/demos/")
+        self.img_base_path = f"{self.folder}/mission-folder/base/base_{self.mission}.png"
+        self.img_base = cv2.imread(self.img_base_path)
+        self.d_kernel = 100
+        self.method = cv2.HISTCMP_BHATTACHARYYA
 
         # parse mu history for svm from muHistory.txt
         self.muHistory = []
@@ -48,77 +55,6 @@ class AUTODEMO:
                 self.labelHistory.append((int(line.split(";")[1])))
         self.muE = self.muHistory[0]
 
-    def retrievePatches(self, argosFile):
-        patches = []
-
-        # parse an xml file by name
-        file = minidom.parse(f'{argosFile}')
-
-        #retriving circle patches
-        circles = file.getElementsByTagName('circle')
-        for c in circles:
-            if(c.getAttribute("color") == "white"):
-                patches.append(ast.literal_eval("[" + c.getAttribute("position") + "," + c.getAttribute("radius") + "]"))
-            else:
-                patches.append(ast.literal_eval("[" + c.getAttribute("position") + "," + c.getAttribute("radius") + "]"))
-
-
-        #retriving rect patches
-        rectangles = file.getElementsByTagName('rectangle')
-        whiteRectangles = []
-        blackRectangles = []
-        for r in rectangles:
-            if(r.getAttribute("color") == "white"):
-                patches.append(ast.literal_eval("[" + r.getAttribute("center") + "," + r.getAttribute("width") + "," + r.getAttribute("height") + "]"))
-            else:
-                patches.append(ast.literal_eval("[" + r.getAttribute("center") + "," + r.getAttribute("width") + "," + r.getAttribute("height") + "]"))
-
-        obstacles = []
-        boxes = file.getElementsByTagName('box')
-        for b in  boxes:
-            if("obstacle" in b.getAttribute("id")):
-                body = b.getElementsByTagName("body")[0]
-                center = ast.literal_eval("[" + body.getAttribute("position") + "]")[:-1]
-                width = ast.literal_eval("[" + b.getAttribute("size") + "]")[1]
-                orientation = ast.literal_eval("[" + body.getAttribute("orientation") + "]")[0]
-                a = [center[0] + width*sin(orientation), center[1] + width*cos(orientation)]
-                b = [center[0] - width*sin(orientation), center[1] - width*cos(orientation)]
-                obstacles.append([a,b])
-
-        return patches, obstacles
-
-    def distToCircle(self, circle, pos):
-        c_x = circle[0]
-        c_y = circle[1]
-        r = circle[2]
-        for obs in self.obstacles:
-            if(self.intersect(pos,circle,obs[0], obs[1])):
-                return self.arenaD
-        return max(0, sqrt((pos[0]-c_x)**2 + (pos[1] - c_y)**2) - r)
-
-    def distToRect(self, rect, pos):
-        x_min = rect[0] - rect[2]/2
-        x_max = rect[0] + rect[2]/2
-        y_min = rect[1] - rect[3]/2
-        y_max = rect[1] + rect[3]/2
-
-        dx = max(x_min - pos[0], 0, pos[0] - x_max)
-        dy = max(y_min - pos[1], 0, pos[1] - y_max)
-        
-        for obs in self.obstacles:
-            if(self.intersect(pos,[x_min,pos[1]],obs[0], obs[1]) or
-               self.intersect(pos,[x_max,pos[1]],obs[0], obs[1]) or
-               self.intersect(pos,[pos[0],y_min],obs[0], obs[1]) or
-               self.intersect(pos,[pos[0],y_max],obs[0], obs[1])):
-               return self.arenaD
-        return sqrt(dx**2 + dy**2)
-
-    def ccw(self, a, b, c):
-        return (c[0] - a[0])*(b[1] - a[1]) > (b[0] - a[0])*(c[1] - a[1])
-
-    # Return true if segments AB and CD intersect
-    def intersect(self, a, b, c, d):
-        return (self.ccw(a,c,d) != self.ccw(b,c,d)) and (self.ccw(a,b,c) != self.ccw(a,b,d))
     
     def computeMu(self, exp=10):
         phi_list = []
@@ -156,40 +92,78 @@ class AUTODEMO:
 
         os.remove(f"{self.folder}/mission-folder/pos.mu")
 
-        phiTot = []
-        for p in self.patches:
-            phi = []
-            patch = p.copy()
+        generate_img = self.img_generator(swarm_pos)
 
-            for pos in swarm_pos:
-                if(len(patch) == 3):
-                    distance = self.distToCircle(patch, pos)
-                else:
-                    distance = self.distToRect(patch, pos)
-                phi.append(distance)
+        _, phi = self.histogram_comparision(generate_img, self.img_base, d_kernel=self.d_kernel, stride=self.d_kernel+1, method=self.method)
+        
+        return phi
+    
+    def histogram_comparision(self, img1, img2, d_kernel, stride, method):
 
-            h = (2*np.log(10))/(self.arenaD**2)
-            phi = [exp(- h * self.arenaD * pos) for pos in phi]
-            phi.sort(reverse=True) 
+        kernel = np.ones((d_kernel,d_kernel), np.float32) / d_kernel**2
 
-            for e in phi: phiTot.append(e)
+        len_img_y, len_img_x, _ = img1.shape
+         
+        len_k = len(kernel)
+        
+
+        if stride != 0 :
+            len_out_y = int(len_img_y/(stride))
+            len_out_x = int(len_img_x/(stride))
+        else:
+            len_out_y = int(len_img_y/(len_k)) 
+            len_out_x = int(len_img_x/(len_k)) 
+
+        #print(len_out_x, len_out_y)
+        
+        histogram = np.zeros((len_out_y,len_out_x))
+
+        a = 0
+        b = 0 
+
+        for n in range(0, len_out_x+1):
+            for m in range(0, len_out_y+1):
+
+                a = m*stride
+                b = n*stride
+
+                img_c1 = img1[a:a+d_kernel,b:b+d_kernel]
+                img_c2 = img2[a:a+d_kernel,b:b+d_kernel]
+
+                hist1 = cv2.calcHist([np.uint8(img_c1)],[0,1,2],None,[8,8,8],[0,256, 0, 256, 0, 256])
+                hist1 = cv2.normalize(hist1, hist1).flatten()
+
+                hist2 = cv2.calcHist([np.uint8(img_c2)],[0,1,2],None,[8,8,8],[0,256, 0, 256, 0, 256])
+                hist2 = cv2.normalize(hist2, hist2).flatten()
+
+                hist_comp = cv2.compareHist(hist1, hist2, method)
+                histogram[m-1,n-1] = hist_comp
 
         
-        phi = []
-        for i in range(len(swarm_pos)):
-            neighbors = swarm_pos.copy()
-            neighbors.pop(i)
-            distance = min([LA.norm(np.array(swarm_pos[i]) - np.array(n), ord=2) for n in neighbors])
-            phi.append(distance)
+        img_out1 = histogram/np.linalg.norm(histogram)
+        length1 = img_out1.shape[0]*img_out1.shape[1]
+        vector_out1 = np.resize(img_out1,[1,length1])
 
-        h = (2*np.log(10))/(self.arenaD**2)
-        phi = [exp(- h * self.arenaD * pos) for pos in phi]
-        phi.sort(reverse=True) 
+        return(img_out1, vector_out1[0])
 
-        for e in phi: phiTot.append(e)
-        
-        
-        return phiTot
+    def img_generator(self, positions):
+        img_base = cv2.imread(self.img_base_path)
+        conversion_factor = 330/1.227894 # radio del cirulo donde se posicionan los robots en px dividido por el radio en metros
+        x_0 = 355 
+        y_0 = 350 
+
+        for position in positions:
+            x_meters,y_meters = position
+
+            x_px = x_meters*conversion_factor
+            y_px = y_meters*conversion_factor
+
+            x = int(np.round(x_0 + x_px,0))
+            y = int(np.round(y_0 + y_px,0))
+
+            cv2.circle(img_base, (x,y), 10, (0,255,0), -1)
+
+        return img_base
 
     def run_Argos(self, pfsm="--fsm-config --nstates 1 --s0 1", sleep=1):
         # Run argos to get features
