@@ -295,6 +295,7 @@ class AUTODEMO:
         with open(f"{self.folder}/mission-folder/irl.txt",'w+') as f:
             f.write(f"{w}\n")
             f.write(f"{self.folder}/mission-folder/{self.mission}.argos")
+            f.write(f"{self.img_base_path}")
         
 if __name__ == '__main__':
     experience = sys.argv[1]
