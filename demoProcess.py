@@ -41,8 +41,8 @@ class AUTODEMO:
         # self.demos = self.computeDemo(self.demoFile)
         # self.patches, self.obstacles = self.retrievePatches(self.demoFile)
 
-        self.img_path_names = os.listdir(f"{self.folder}/demos/{self.mission}/")
-        self.img_base_path = f"{self.folder}/bases/base_{self.mission}.png"
+        self.img_path_names = os.listdir(f"{self.folder}/mission-folder/demos/")
+        self.img_base_path = f"{self.folder}/mission-folder/base/base_{self.mission}.png"
         self.img_base = cv2.imread(self.img_base_path)
         self.d_kernel = 100
         self.method = cv2.HISTCMP_BHATTACHARYYA
@@ -69,11 +69,11 @@ class AUTODEMO:
         phi_list = []
         
         for img_name in self.img_path_names:
-            img = cv2.imread(f"{self.folder}/demos/{self.mission}/{img_name}")
-
-            _, phi = self.histogram_comparision(img, self.img_base, d_kernel=self.d_kernel, stride=self.d_kernel+1, method=self.method)
-            print(f"phiE: {phi}")
-            phi_list.append(phi)
+            if img_name.endswith(".png"):
+                img = cv2.imread(f"{self.folder}/mission-folder/demos/{img_name}")
+                _, phi = self.histogram_comparision(img, self.img_base, d_kernel=self.d_kernel, stride=self.d_kernel+1, method=self.method)
+                print(f"phiE: {phi}")
+                phi_list.append(phi)
 
         mu = []
         for j in range(len(phi_list[0])):
