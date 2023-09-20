@@ -8,14 +8,14 @@
 #SBATCH -n 16
 #SBATCH -o ./irace-%A.stdout
 #SBATCH -e ./irace-%A.stderr
-#SBATCH -D /home/igharbi/autodemo/irace/
+#SBATCH -D /home/jpmedina/autodemo/irace/
 
 ## Job Steps
 MISSION="$1"
 ITER=$2
 
-source /home/igharbi/igharbi-venv/bin/activate
-source /home/igharbi/setup.sh
+source /home/jpmedina/democho_venv/bin/activate
+##source /home/igharbi/setup.sh
 export PATH
 export OMPI_MCA_plm_rsh_disable_qrsh=1
 export MPIRUN=/opt/ohpc/pub/mpi/openmpi4-gnu9/4.0.5/bin/mpirun
@@ -24,7 +24,7 @@ cd $MISSION
 echo "$MISSION"
 echo "Prepare Json file"
 
-python3 /home/igharbi/demoProcess.py $MISSION
+python3 /home/jpmedina/autodemo/demoProcess.py $MISSION
 
 echo "Begin irace iterations"
 
@@ -36,7 +36,7 @@ do
   echo "reading fsm.txt"
   Rscript fsm_collector.R
   echo "fsm_collector finished"
-  python3 /home/igharbi/pfsmCollector.py $MISSION $i
+  python3 /home/jpmedina/autodemo/pfsmCollector.py $MISSION $i
 done
 
 echo "end of experience"
