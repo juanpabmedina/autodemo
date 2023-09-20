@@ -1,2 +1,3 @@
 #!/usr/bin/env python
-/home/jpmedina/argos3-installation/chocolate/ARGoS3-AutoMoDe/bin/automode_main -n -c /home/jpmedina/autodemo/irace/aac_19_1/mission-folder/aac.argos --fsm-config --fsm-config --nstates 2 --s0 4 --att0 4.54 --n0 4 --n0x0 0 --c0x0 1 --p0x0 0.33 --n0x1 0 --c0x1 0 --p0x1 0.38 --n0x2 0 --c0x2 3 --p0x2 8 --w0x2 12.32 --n0x3 0 --c0x3 3 --p0x3 1 --w0x3 6.15 --s1 2 --n1 3 --n1x0 0 --c1x0 4 --p1x0 7 --w1x0 10.74 --n1x1 0 --c1x1 0 --p1x1 0.1 --n1x2 0 --c1x2 5 --p1x2 0.79
+/home/jpmedina/argos3-installation/chocolate/ARGoS3-AutoMoDe/bin/automode_main -n -c /home/jpmedina/autodemo/irace/aac_19_1/mission-folder/aac.argos
+ --fsm-config --fsm-config --nstates 1 --s0 2
