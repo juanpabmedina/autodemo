@@ -151,6 +151,7 @@ class AUTODEMO:
         conversion_factor = 330/1.227894 # radio del cirulo donde se posicionan los robots en px dividido por el radio en metros
         x_0 = 355 
         y_0 = 350 
+        len_y, _, _ = img_base.shape
 
         for position in positions:
             x_meters,y_meters = position
@@ -158,10 +159,10 @@ class AUTODEMO:
             x_px = x_meters*conversion_factor
             y_px = y_meters*conversion_factor
 
-            x = int(np.round(x_0 + x_px,0))
+            x = int(np.round(x_0 - x_px,0))
             y = int(np.round(y_0 + y_px,0))
 
-            cv2.circle(img_base, (x,y), 10, (0,255,0), -1)
+            cv2.circle(img_base, (len_y-y,x), 10, (0,255,0), -1)
 
         return img_base
 
