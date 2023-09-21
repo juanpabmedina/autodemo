@@ -21,7 +21,7 @@ export OMPI_MCA_plm_rsh_disable_qrsh=1
 export MPIRUN=/opt/ohpc/pub/mpi/openmpi4-gnu9/4.0.5/bin/mpirun
 
 cd $MISSION
-chmod +x targer-runner
+chmod +x target-runner
 echo "$MISSION"
 echo "Prepare Json file"
 

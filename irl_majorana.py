@@ -109,8 +109,10 @@ def histogram_comparision(img1, img2, d_kernel, stride, method):
             hist_comp = cv2.compareHist(hist1, hist2, method)
             histogram[m-1,n-1] = hist_comp
 
-    
-    img_out1 = histogram/np.linalg.norm(histogram)
+    if np.linalg.norm(histogram) != 0: 
+        img_out1 = histogram/np.linalg.norm(histogram)
+    else:
+        img_out1 = histogram
     length1 = img_out1.shape[0]*img_out1.shape[1]
     vector_out1 = np.resize(img_out1,[1,length1])
 
@@ -238,7 +240,7 @@ def computeScore(fsm, w, argos, imgBase):
 if __name__ == '__main__':
     with open("../mission-folder/irl.txt",'r') as f:
         w = ast.literal_eval(f.readline())
-        argos = f.readline()
+        argos = f.readline().split('\n')[0]
         imgBase = f.readline()
 
     fsm = sys.argv[1]
