@@ -34,7 +34,7 @@ class AUTODEMO:
     def __init__(self, experience):
         self.experience = experience
         self.mission = self.experience.split("_")[0]
-        self.folder = f"/home/jpmedina/autodemo/irace/{experience}"
+        self.folder = f"/home/jpmedina/originalAutodemo/irace/{experience}"
         self.demoFile = f"{self.folder}/mission-folder/{self.mission}.argos"
         self.arenaD = 3
         self.demos = self.computeDemo(self.demoFile)

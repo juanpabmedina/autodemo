@@ -33,7 +33,7 @@ class AUTODEMO:
         self.iteration = iteration
         self.experience = experience
         self.mission = self.experience.split("_")[0]
-        self.folder = f"/home/jpmedina/autodemo/irace/{experience}"
+        self.folder = f"/home/jpmedina/originalAutodemo/autodemo/irace/{experience}"
         self.demoFile = f"{self.folder}/mission-folder/{self.mission}.argos"
         self.arenaD = 3
         self.patches, self.obstacles = self.retrievePatches(self.demoFile)

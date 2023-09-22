@@ -18,7 +18,7 @@
 # Note that this script is ran from the execution directory
 
 EXE=/home/jpmedina/argos3-installation/chocolate/ARGoS3-AutoMoDe/bin/automode_main
-IRL=/home/jpmedina/autodemo/irl_majorana.py
+IRL=/home/jpmedina/originalAutodemo/autodemo/irl_majorana.py
 
 CONFIG_ID="$1"
 INSTANCE_ID="$2"
