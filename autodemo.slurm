@@ -6,8 +6,8 @@
 #SBATCH -q long
 #SBATCH -N 1  #This specify the number of nodes you want to use, force N=1 because we have issues if irace is running on more than one node
 #SBATCH -n 16
-#SBATCH -o ./irace-%A.stdout
-#SBATCH -e ./irace-%A.stderr
+#SBATCH -o ./std/irace-%A.stdout
+#SBATCH -e ./std/irace-%A.stderr
 #SBATCH -D /home/jpmedina/autodemo/irace/
 
 ## Job Steps
