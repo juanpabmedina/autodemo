@@ -6,6 +6,7 @@ import os
 import ast
 import sys
 import json
+from datetime import datetime
 from xml.dom import minidom
 from math import exp, sqrt, sin, cos
 from sklearn import svm
@@ -248,8 +249,12 @@ class AUTODEMO:
         print(f"iteration {self.iteration}")
         print(f"t = {t}")
 
+        now = datetime.now()
+        dt = now.strftime("%d_%m_%Y_%H_%M_%S")
+
         dico = {"iter" : self.iteration,
                 "fsm" : pfsm,
+                "time" : dt,
                 "best fsm" : best_pfsm,
                 "mu" : [round(e,6) for e in self.mu],
                 "phis" : [[round(e,6) for e in phi] for phi in phi_list],

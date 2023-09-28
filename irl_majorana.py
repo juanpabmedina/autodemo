@@ -105,7 +105,7 @@ def compute_phi(fsm, argos):
                         swarm_pos.append(line)
                 except:
                     print("misshape line")
-            if(len(swarm_pos) == 20):
+            if(len(swarm_pos) == 40):
                 succeed = True
          
     phiTot = []
