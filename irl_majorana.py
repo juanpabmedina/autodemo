@@ -176,7 +176,7 @@ def compute_phi(fsm, argos, img_base_path):
                         swarm_pos.append(line)
                 except:
                     print("misshape line")
-            if(len(swarm_pos) == 20):
+            if(len(swarm_pos) == 40):
                 succeed = True
          
     # phiTot = []
