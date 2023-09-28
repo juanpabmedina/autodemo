@@ -71,7 +71,7 @@ class AUTODEMO:
             for e in epucks:
                 pos.append(ast.literal_eval("[" + e.getAttribute("position") + "]"))
             positions.append(pos)
-        print(f"Demo pos: {positions}")
+        print#(f"Demo pos: {positions}")
         
         return positions    
 
@@ -148,7 +148,7 @@ class AUTODEMO:
         phi_list = []
         for demo in self.demos:
             phi = self.computePhiE(demo)
-            print(f"phiE: {phi}")
+            #print(f"phiE: {phi}")
             phi_list.append(phi)
 
         mu = []
@@ -202,7 +202,7 @@ class AUTODEMO:
         phi_list = []
         for _ in range(exp):
             phi = self.computePhi()
-            print(f"phi: {phi}")
+            #print(f"phi: {phi}")
             phi_list.append(phi)
 
         mu = []
@@ -230,7 +230,7 @@ class AUTODEMO:
         with open(f"{self.folder}/mission-folder/pos.mu", "r") as f:
             for pos in f.readlines():
                 swarm_pos.append(ast.literal_eval("[" + pos[:-2] + "]"))
-            print(f"swarm pos: {swarm_pos}")
+            #print(f"swarm pos: {swarm_pos}")
 
         os.remove(f"{self.folder}/mission-folder/pos.mu")
 
@@ -335,7 +335,7 @@ class AUTODEMO:
         bpfsm = " ".join(self.BestPFSM.convert_to_commandline_args())
         w, t, svm, SVs = self.computeMargin(init=True)
         print(f"iteration 0")
-        print(f"w = {w}")
+        #print(f"w = {w}")
         print(f"t = {t}")
 
         now = datetime.now()
